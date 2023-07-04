@@ -1,0 +1,21 @@
+
+@PACKAGE_INIT@
+
+macro(import_targets type)
+    if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/mnv-${type}-targets.cmake")
+        set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "mnv ${type} libraries were requested but not found")
+        set(${CMAKE_FIND_PACKAGE_NAME}_FOUND OFF)
+        return()
+    endif()
+
+    include("${CMAKE_CURRENT_LIST_DIR}/mnv-${type}-targets.cmake")
+endmacro()
+
+if(NOT TARGET mnv::mnv)
+    set(type "static")
+    import_targets(${type})
+
+    check_required_components(mnv)
+
+    message("-- Found ${type} mnv (version ${${CMAKE_FIND_PACKAGE_NAME}_VERSION})")
+endif()
