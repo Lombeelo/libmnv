@@ -5,27 +5,28 @@
 #include <array>
 #include <cmath>
 #include <random>
+#include <variant>
 #include <vector>
 
 namespace mnv
 {
-    template <typename T, size_t Len>
-    using valueVector = std::array<T, Len>;
+    template <typename T, size_t Dim>
+    using valueVector = std::array<T, Dim>;
 
     template <typename T, size_t LenRows, size_t LenCols>
     using Matrix = valueVector<valueVector<T, LenCols>, LenRows>;
 
-    template <typename T, size_t Len>
-    using MatrixSq = Matrix<T, Len, Len>;
+    template <typename T, size_t Dim>
+    using MatrixSq = Matrix<T, Dim, Dim>;
 
     namespace internal
     {
-        template <typename T, size_t Len>
-        valueVector<T, Len> multiplyVectors(valueVector<T, Len> first, valueVector<T, Len> second)
+        template <typename T, size_t Dim>
+        T vectorDotProduct(valueVector<T, Dim> first, valueVector<T, Dim> second)
         {
-            T result;
+            T result{};
 
-            for (int i = 0; i < first.size(); i++)
+            for (size_t i = 0; i < first.size(); i++)
             {
                 result += first[i] * second[i];
             }
@@ -33,12 +34,12 @@ namespace mnv
             return result;
         }
 
-        template <typename T, size_t Len>
-        valueVector<T, Len> addVectors(valueVector<T, Len> first, valueVector<T, Len> second)
+        template <typename T, size_t Dim>
+        valueVector<T, Dim> addVectors(valueVector<T, Dim> first, valueVector<T, Dim> second)
         {
-            valueVector<T, Len> result;
+            valueVector<T, Dim> result{};
 
-            for (int i = 0; i < first.size(); i++)
+            for (size_t i = 0; i < first.size(); i++)
             {
                 result[i] = first[i] + second[i];
             }
@@ -46,26 +47,13 @@ namespace mnv
             return result;
         }
 
-        template <typename T>
-        T calculateMean(std::vector<T> &input_values)
-        {
-            T result;
-
-            for (auto &&value : input_values)
-            {
-                result += value;
-            }
-
-            return result / input_values.size();
-        }
-
         inline bool isOdd(size_t number)
         {
             return static_cast<bool>(number & 1);
         }
 
-        template <typename T, size_t Len>
-        T calculateMinor(MatrixSq<T, Len> matrix, int minor_order)
+        template <typename T, size_t Dim>
+        T calculateMinor(MatrixSq<T, Dim> matrix, int minor_order)
         {
             if (minor_order == 1)
             {
@@ -83,7 +71,7 @@ namespace mnv
             size_t column = 0;
             for (size_t row = 0; row < minor_order; row++)
             {
-                MatrixSq<T, Len> minorMatrix;
+                MatrixSq<T, Dim> minorMatrix;
                 for (size_t i = 0; i < minor_order - 1; i++)
                 {
                     for (size_t j = 0; j < minor_order - 1; j++)
@@ -110,8 +98,8 @@ namespace mnv
             Undefinite
         };
 
-        template <typename T, size_t Len>
-        MatrixDefinition defineMatrix(MatrixSq<T, Len> matrix)
+        template <typename T, size_t Dim>
+        MatrixDefinition defineMatrix(MatrixSq<T, Dim> matrix)
         {
             MatrixDefinition result = MatrixDefinition::ZeroDefinite;
             bool firstZero = false;
@@ -181,21 +169,8 @@ namespace mnv
             return result;
         }
 
-        template <typename T, size_t Len>
-        T sumOfSquaresUntil(valueVector<T, Len> vector, size_t idx)
-        {
-            T sum = 0;
-
-            for (size_t i = 0; i < idx; i++)
-            {
-                sum += vector[i] * vector[i];
-            }
-
-            return sum;
-        }
-
-        template <typename T, size_t Len>
-        T sumOfProductsUntil(valueVector<T, Len> vectorA, valueVector<T, Len> vectorB, size_t idx)
+        template <typename T, size_t Dim>
+        T sumOfProductsUntil(valueVector<T, Dim> vectorA, valueVector<T, Dim> vectorB, size_t idx)
         {
             T sum = 0;
 
@@ -207,8 +182,14 @@ namespace mnv
             return sum;
         }
 
+        template <typename T, size_t Dim>
+        T sumOfSquaresUntil(valueVector<T, Dim> vector, size_t idx)
+        {
+            return sumOfProductsUntil(vector, vector, idx);
+        }
+
         template <typename MatrixType>
-        inline bool isMatrixSymmetic(MatrixType matrix)
+        inline bool isMatrixSymmetric(MatrixType matrix)
         {
             for (size_t i = 0; i < matrix.size() - 1; i++)
             {
@@ -223,64 +204,83 @@ namespace mnv
             return true;
         }
 
-        template <typename T, size_t Len>
-        MatrixSq<T, Len> doCholetskyDecomposition(MatrixSq<T, Len> matrix)
+        template <typename T, size_t Dim>
+        MatrixSq<T, Dim> doCholetskyDecomposition(MatrixSq<T, Dim> matrix)
         {
-            MatrixSq<T, Len> result;
+            MatrixSq<T, Dim> result{};
             // 3. Decomposition itself
             for (size_t j = 0; j < matrix.size(); j++)
             {
-                for (size_t i = 0; i < matrix.size(); i++)
+                for (size_t i = j; i < matrix.size(); i++)
                 {
-                    if ((i == 1) && (j == 1))
+                    if ((i == 0) && (j == 0))
                     {
-                        matrix[i][j] = std::sqrt<T>(matrix[i][i]);
+                        result[i][j] = std::sqrt(matrix[i][i]);
                         continue;
                     }
 
-                    if (j == 1)
+                    if (j == 0)
                     {
-                        matrix[i][j] = matrix[i][j] / result[0][0];
+                        result[i][j] = matrix[i][j] / result[0][0];
                         continue;
                     }
 
                     if (i == j)
                     {
-                        matrix[i][j] = std::sqrt<T>(matrix[i][i] - sumOfSquaresUntil(result[i], i));
+                        result[i][j] = std::sqrt(matrix[i][i] - sumOfSquaresUntil(result[i], j));
                         continue;
                     }
-
-                    matrix[i][j] = (matrix[i][j] - sumOfProductsUntil(result[i], result[j], i)) / result[i][i];
+                    result[i][j] = (matrix[i][j] - sumOfProductsUntil(result[i], result[j], j)) / result[j][j];
                 }
             }
 
             return result;
         }
 
-        template <typename T, size_t Len>
-        valueVector<T, Len> multiplyVectorByMatrix(valueVector<T, Len> vector, MatrixSq<T, Len> matrix)
+        template <typename T, size_t Dim>
+        valueVector<T, Dim> multiplyMatrixByVector(MatrixSq<T, Dim> matrix, valueVector<T, Dim> vector)
         {
-            // TODO: implement the method
-            return vector;
+            valueVector<T, Dim> result{};
+            for (size_t i = 0; i < result.size(); i++)
+            {
+                result[i] = vectorDotProduct(matrix[i], vector);
+            }
+
+            return result;
         }
     } // namespace internal
 
-    template <typename T, size_t Len>
-    valueVector<T, Len> generateMNV(MatrixSq<T, Len> covariance, valueVector<T, Len> meanVector, size_t seed)
+    template <typename T, size_t Dim>
+    valueVector<T, Dim> MNVGenerator<T, Dim>::nextValue()
+    {
+        valueVector<T, Dim> randomStandardNormalVector{};
+
+        for (size_t i = 0; i < randomStandardNormalVector.size(); i++)
+        {
+            randomStandardNormalVector[i] = distribution(m_generator);
+        }
+
+        valueVector<T, Dim> multipliedVector =
+            internal::multiplyMatrixByVector(randomStandardNormalVector, m_decomposedCovariance);
+        return internal::addVectors(multipliedVector, m_mean);
+    }
+
+    enum class MNVGeneratorBuildError : size_t;
+
+    template <typename T, size_t Dim>
+    std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError> MNVGenerator<T, Dim>::build(
+        MatrixSq<T, Dim> covariance,
+        valueVector<T, Dim> mean,
+        size_t seed)
     {
         using ::mnv::internal::MatrixDefinition;
 
-        static std::mt19937 generator{};
-        generator.seed(seed);
-        std::normal_distribution<T> distribution{0, 1};
-
-        valueVector<T, Len> randomStandardNormalVector{};
         // 1. Check for symmetric matrix
 
-        if (!internal::isMatrixSymmetic(covariance))
+        if (!internal::isMatrixSymmetric(covariance))
         {
             // error: ABSOLUTELY wrong matrix
-            return randomStandardNormalVector;
+            return MNVGeneratorBuildError::CovarianceMatrixIsNotSymmetric;
         }
 
         // 2. Check for positive-definite matrix
@@ -292,27 +292,28 @@ namespace mnv
         case MatrixDefinition::NegativeSemidefinite: // error: how tf you did that (wrong matrix)?
         case MatrixDefinition::Undefinite:           // error: how tf you did that (wrong matrix)?
         case MatrixDefinition::PositiveSemidefinite: // error: not enough values
-        case MatrixDefinition::ZeroDefinite:         // error: empty matrix
-            return randomStandardNormalVector;
+            return MNVGeneratorBuildError::CovarianceMatrixIsNotPositiveDefinite;
 
+        case MatrixDefinition::ZeroDefinite:
         case MatrixDefinition::PositiveDefinite: // ok
             break;
         }
 
-        for (size_t i = 0; i < randomStandardNormalVector.size(); i++)
-        {
-            randomStandardNormalVector[i] = distribution(generator);
-        }
-
-        MatrixSq<T, Len> decomposedMatrix = internal::doCholetskyDecomposition(covariance);
-        valueVector<T, Len> multipliedVector = internal::multiplyVectorByMatrix(randomStandardNormalVector, decomposedMatrix);
-        return internal::addVectors(multipliedVector, meanVector);
+        return MNVGenerator(internal::doCholetskyDecomposition(covariance), mean, seed);
     }
 
-    template <typename T, size_t Len>
-    valueVector<T, Len> calculateMeanVector(std::vector<valueVector<T, Len>> &input_vectors)
+    // private constructor is used to force MNVGenerator::build()
+    template <typename T, size_t Dim>
+    MNVGenerator<T, Dim>::MNVGenerator(MatrixSq<T, Dim> decomposedCovariance, valueVector<T, Dim> mean, size_t seed)
+        : m_decomposedCovariance(decomposedCovariance), m_mean(mean), m_seed(seed)
     {
-        valueVector<T, Len> result;
+        this->m_generator.seed(seed);
+    }
+
+    template <typename T, size_t Dim>
+    valueVector<T, Dim> calculateMeanVector(std::vector<valueVector<T, Dim>> const &input_vectors)
+    {
+        valueVector<T, Dim> result{};
 
         for (auto &&vec : input_vectors)
         {
@@ -321,20 +322,20 @@ namespace mnv
 
         for (size_t i = 0; i < result.size(); i++)
         {
-            result[i] /= input_vectors.size();
+            result[i] /= static_cast<T>(input_vectors.size());
         }
 
         return result;
     }
 
-    template <typename T, size_t Len>
-    MatrixSq<T, Len> calculateCovarianceMatrix(std::vector<valueVector<T, Len>> &input_vectors)
+    template <typename T, size_t Dim>
+    MatrixSq<T, Dim> calculateCovarianceMatrix(std::vector<valueVector<T, Dim>> const &input_vectors)
     {
-        MatrixSq<T, Len> result;
+        MatrixSq<T, Dim> result{};
 
-        valueVector<T, Len> mean = calculateMeanVector(input_vectors);
+        valueVector<T, Dim> mean = calculateMeanVector(input_vectors);
 
-        for (int i = 0; i < result.size(); i++)
+        for (size_t i = 0; i < result.size(); i++)
         {
             for (int j = 0; j < result.size(); j++)
             {

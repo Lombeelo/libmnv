@@ -52,7 +52,6 @@ endif()
 #----------------------------------------------------------------------------------------------------------------------
 
 set(sources
-    add_test.cpp
     mnv_test.cpp)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
@@ -66,7 +65,8 @@ target_sources(mnv-tests PRIVATE ${sources})
 target_link_libraries(mnv-tests
     PRIVATE
         mnv::mnv
-        gtest_main)
+        gtest_main
+        gmock_main)
 
 
 include(GoogleTest)
