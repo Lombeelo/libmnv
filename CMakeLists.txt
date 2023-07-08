@@ -42,6 +42,7 @@ generate_export_header(mnv EXPORT_FILE_NAME include/mnv/${export_file_name})
 
 set(sources
     include/mnv/mnv.hpp
+    include/mnv/mnv-impl.hpp
     src/mnv.cpp)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
@@ -77,5 +78,5 @@ endif()
 
 if(MNV_BUILD_DOCS)
     find_package(Doxygen REQUIRED)
-    doxygen_add_docs(docs include)
+    doxygen_add_docs(docs include/mnv ./docs)
 endif()

@@ -1,0 +1,14 @@
+/*!
+\mainpage This is a main page for libmnv
+
+\section intro_sec Introduction
+
+This is the introduction.
+
+\section install_sec Installation
+
+1. Copy headers
+2. Voila
+
+\subsection step1 Step 1: Opening the box
+*/
