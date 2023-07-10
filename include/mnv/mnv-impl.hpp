@@ -276,7 +276,7 @@ namespace mnv
             // error: ABSOLUTELY wrong matrix
             return MNVGeneratorBuildError{
                 MNVGeneratorBuildError::type::CovarianceMatrixIsNotSymmetric,
-                "The covariance matrix provided is not symmetric. It's totally unsuitable to use here. Please provide a valid covariance matrix."};
+                ERRMSG("The covariance matrix provided is not symmetric. It's totally unsuitable to use here. Please provide a valid covariance matrix.")};
         }
 
         // 2. Check for positive-definite matrix
@@ -288,7 +288,7 @@ namespace mnv
         case MatrixDefinition::Undefinite:       // error: how tf you did that (wrong matrix)?
             return MNVGeneratorBuildError{
                 MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite,
-                "The covariance matrix provided is not positive-definite. Is it the right matrix?"};
+                ERRMSG("The covariance matrix provided is not positive-definite. Is it the right matrix?")};
 
         case MatrixDefinition::PositiveDefinite: // ok
             break;

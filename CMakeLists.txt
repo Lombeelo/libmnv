@@ -21,6 +21,7 @@ option(MNV_ERRORS_INCLUDE_MESSAGES "The returned error types contain the error m
 
 
 
+
 if(NOT DEFINED CMAKE_BUILD_TYPE AND NOT DEFINED CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
@@ -56,6 +57,9 @@ target_include_directories(mnv
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>")
 
+  if(MNV_ERRORS_INCLUDE_MESSAGES)
+        target_compile_definitions(mnv INTERFACE MNV_ERRORS_INCLUDE_MESSAGES)
+  endif()
 #----------------------------------------------------------------------------------------------------------------------
 # other targets
 #----------------------------------------------------------------------------------------------------------------------

@@ -11,6 +11,12 @@
 #include <variant>
 #include <vector>
 
+#ifdef MNV_ERRORS_INCLUDE_MESSAGES
+#define ERRMSG(str) str
+#else
+#define ERRMSG(str)
+#endif
+
 /**
  * @file mnv.hpp Main interface file of the mnv library
  * @author Dmitry Parfenyuk (cekunda.rf@gmail.com)
@@ -66,12 +72,13 @@ namespace mnv
          *
          */
         type type;
-
+#ifdef MNV_ERRORS_INCLUDE_MESSAGES
         /**
          * @brief Error message. You can use them to print the error
          *
          */
         std::string_view message;
+#endif
     };
 
     /**
