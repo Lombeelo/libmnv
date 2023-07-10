@@ -4,7 +4,7 @@
 
 int main(int, char *[])
 {
-    auto sum = mnv::add(1, 1);
-    std::cout << sum << std::endl;
+    // auto sum = mnv::add(1, 1);
+    // std::cout << sum << std::endl;
     return 0;
 }

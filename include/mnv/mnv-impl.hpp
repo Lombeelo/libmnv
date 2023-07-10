@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <memory>
 #include <random>
 #include <variant>
 #include <vector>
@@ -13,16 +14,13 @@ namespace mnv
     template <typename T, size_t Dim>
     using valueVector = std::array<T, Dim>;
 
-    template <typename T, size_t LenRows, size_t LenCols>
-    using Matrix = valueVector<valueVector<T, LenCols>, LenRows>;
-
     template <typename T, size_t Dim>
-    using MatrixSq = Matrix<T, Dim, Dim>;
+    using MatrixSq = valueVector<valueVector<T, Dim>, Dim>;
 
     namespace internal
     {
         template <typename T, size_t Dim>
-        T vectorDotProduct(valueVector<T, Dim> first, valueVector<T, Dim> second)
+        T vectorDotProduct(valueVector<T, Dim> const &first, valueVector<T, Dim> const &second)
         {
             T result{};
 
@@ -35,7 +33,7 @@ namespace mnv
         }
 
         template <typename T, size_t Dim>
-        valueVector<T, Dim> addVectors(valueVector<T, Dim> first, valueVector<T, Dim> second)
+        valueVector<T, Dim> addVectors(valueVector<T, Dim> const &first, valueVector<T, Dim> const &second)
         {
             valueVector<T, Dim> result{};
 
@@ -53,7 +51,7 @@ namespace mnv
         }
 
         template <typename T, size_t Dim>
-        T calculateMinor(MatrixSq<T, Dim> matrix, int minor_order)
+        T calculateMinor(MatrixSq<T, Dim> const &matrix, unsigned int minor_order)
         {
             if (minor_order == 1)
             {
@@ -76,13 +74,13 @@ namespace mnv
                 {
                     for (size_t j = 0; j < minor_order - 1; j++)
                     {
-                        minorMatrix[i][j] = matrix[i + (column + 1)][j + (j >= row)];
+                        minorMatrix[i][j] = matrix[i + (i >= row)][j + (column + 1)];
                     }
                 }
-                T otherMinor = calculateMinor(minorMatrix, minor_order - 1);
+                T otherMinor = matrix[row][column] * calculateMinor(minorMatrix, minor_order - 1);
                 sum = isOdd(row)
-                          ? sum + otherMinor
-                          : sum - otherMinor;
+                          ? sum - otherMinor
+                          : sum + otherMinor;
             }
 
             return sum;
@@ -92,32 +90,33 @@ namespace mnv
         {
             ZeroDefinite,
             PositiveDefinite,
-            PositiveSemidefinite,
             NegativeDefinite,
-            NegativeSemidefinite,
             Undefinite
         };
 
         template <typename T, size_t Dim>
-        MatrixDefinition defineMatrix(MatrixSq<T, Dim> matrix)
+        MatrixDefinition defineMatrix(MatrixSq<T, Dim> const &matrix)
         {
             MatrixDefinition result = MatrixDefinition::ZeroDefinite;
-            bool firstZero = false;
+            bool lastNegative = false;
             for (size_t i = 1; i < matrix.size() + 1; i++)
             {
-                T minor = calculateMinor(matrix, i);
+                T minor = calculateMinor(matrix, (unsigned int)i);
                 if (minor > 0)
                 {
                     switch (result)
                     {
                     case MatrixDefinition::ZeroDefinite:
-                        result = firstZero
-                                     ? MatrixDefinition::PositiveSemidefinite
-                                     : MatrixDefinition::PositiveDefinite;
+                        result = MatrixDefinition::PositiveDefinite;
                         break;
 
                     case MatrixDefinition::NegativeDefinite:
-                    case MatrixDefinition::NegativeSemidefinite:
+                        if (lastNegative)
+                        {
+                            lastNegative = false;
+                            break;
+                        }
+
                         result = MatrixDefinition::Undefinite;
                         break;
 
@@ -131,13 +130,21 @@ namespace mnv
                     switch (result)
                     {
                     case MatrixDefinition::ZeroDefinite:
-                        result = firstZero
-                                     ? MatrixDefinition::NegativeSemidefinite
-                                     : MatrixDefinition::NegativeDefinite;
+                        result = MatrixDefinition::NegativeDefinite;
+                        lastNegative = true;
+                        break;
+
+                    case MatrixDefinition::NegativeDefinite:
+                        if (!lastNegative)
+                        {
+                            lastNegative = true;
+                            break;
+                        }
+
+                        result = MatrixDefinition::Undefinite;
                         break;
 
                     case MatrixDefinition::PositiveDefinite:
-                    case MatrixDefinition::PositiveSemidefinite:
                         result = MatrixDefinition::Undefinite;
                         break;
 
@@ -148,21 +155,7 @@ namespace mnv
 
                 if (minor == 0)
                 {
-                    switch (result)
-                    {
-                    case MatrixDefinition::PositiveDefinite:
-                        result = MatrixDefinition::PositiveSemidefinite;
-                        break;
-                    case MatrixDefinition::NegativeDefinite:
-                        result = MatrixDefinition::NegativeSemidefinite;
-                        break;
-
-                    case MatrixDefinition::ZeroDefinite:
-                        firstZero = true;
-
-                    default:
-                        break;
-                    }
+                    return MatrixDefinition::Undefinite;
                 }
             }
 
@@ -170,7 +163,7 @@ namespace mnv
         }
 
         template <typename T, size_t Dim>
-        T sumOfProductsUntil(valueVector<T, Dim> vectorA, valueVector<T, Dim> vectorB, size_t idx)
+        T sumOfProductsUntil(valueVector<T, Dim> const &vectorA, valueVector<T, Dim> const &vectorB, size_t idx)
         {
             T sum = 0;
 
@@ -183,13 +176,13 @@ namespace mnv
         }
 
         template <typename T, size_t Dim>
-        T sumOfSquaresUntil(valueVector<T, Dim> vector, size_t idx)
+        T sumOfSquaresUntil(valueVector<T, Dim> const &vector, size_t idx)
         {
             return sumOfProductsUntil(vector, vector, idx);
         }
 
         template <typename MatrixType>
-        inline bool isMatrixSymmetric(MatrixType matrix)
+        inline bool isMatrixSymmetric(MatrixType const &matrix)
         {
             for (size_t i = 0; i < matrix.size() - 1; i++)
             {
@@ -205,7 +198,7 @@ namespace mnv
         }
 
         template <typename T, size_t Dim>
-        MatrixSq<T, Dim> doCholetskyDecomposition(MatrixSq<T, Dim> matrix)
+        MatrixSq<T, Dim> doCholetskyDecomposition(MatrixSq<T, Dim> const &matrix)
         {
             MatrixSq<T, Dim> result{};
             // 3. Decomposition itself
@@ -238,7 +231,7 @@ namespace mnv
         }
 
         template <typename T, size_t Dim>
-        valueVector<T, Dim> multiplyMatrixByVector(MatrixSq<T, Dim> matrix, valueVector<T, Dim> vector)
+        valueVector<T, Dim> multiplyMatrixByVector(MatrixSq<T, Dim> const &matrix, valueVector<T, Dim> const &vector)
         {
             valueVector<T, Dim> result{};
             for (size_t i = 0; i < result.size(); i++)
@@ -261,16 +254,17 @@ namespace mnv
         }
 
         valueVector<T, Dim> multipliedVector =
-            internal::multiplyMatrixByVector(randomStandardNormalVector, m_decomposedCovariance);
+            internal::multiplyMatrixByVector(m_decomposedCovariance, randomStandardNormalVector);
         return internal::addVectors(multipliedVector, m_mean);
     }
 
-    enum class MNVGeneratorBuildError : size_t;
+    struct MNVGeneratorBuildError;
 
     template <typename T, size_t Dim>
-    std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError> MNVGenerator<T, Dim>::build(
-        MatrixSq<T, Dim> covariance,
-        valueVector<T, Dim> mean,
+    std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError>
+    MNVGenerator<T, Dim>::build(
+        MatrixSq<T, Dim> const &covariance,
+        valueVector<T, Dim> const &mean,
         size_t seed)
     {
         using ::mnv::internal::MatrixDefinition;
@@ -280,7 +274,9 @@ namespace mnv
         if (!internal::isMatrixSymmetric(covariance))
         {
             // error: ABSOLUTELY wrong matrix
-            return MNVGeneratorBuildError::CovarianceMatrixIsNotSymmetric;
+            return MNVGeneratorBuildError{
+                MNVGeneratorBuildError::type::CovarianceMatrixIsNotSymmetric,
+                "The covariance matrix provided is not symmetric. It's totally unsuitable to use here. Please provide a valid covariance matrix."};
         }
 
         // 2. Check for positive-definite matrix
@@ -288,18 +284,20 @@ namespace mnv
         MatrixDefinition def = internal::defineMatrix(covariance);
         switch (def)
         {
-        case MatrixDefinition::NegativeDefinite:     // error: how tf you did that (wrong matrix)?
-        case MatrixDefinition::NegativeSemidefinite: // error: how tf you did that (wrong matrix)?
-        case MatrixDefinition::Undefinite:           // error: how tf you did that (wrong matrix)?
-        case MatrixDefinition::PositiveSemidefinite: // error: not enough values
-            return MNVGeneratorBuildError::CovarianceMatrixIsNotPositiveDefinite;
+        case MatrixDefinition::NegativeDefinite: // error: how tf you did that (wrong matrix)?
+        case MatrixDefinition::Undefinite:       // error: how tf you did that (wrong matrix)?
+            return MNVGeneratorBuildError{
+                MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite,
+                "The covariance matrix provided is not positive-definite. Is it the right matrix?"};
 
-        case MatrixDefinition::ZeroDefinite:
         case MatrixDefinition::PositiveDefinite: // ok
+            break;
+        default:
             break;
         }
 
-        return MNVGenerator(internal::doCholetskyDecomposition(covariance), mean, seed);
+        return MNVGenerator<T, Dim>(
+            internal::doCholetskyDecomposition(covariance), mean, seed);
     }
 
     // private constructor is used to force MNVGenerator::build()
@@ -337,14 +335,14 @@ namespace mnv
 
         for (size_t i = 0; i < result.size(); i++)
         {
-            for (int j = 0; j < result.size(); j++)
+            for (size_t j = 0; j < result.size(); j++)
             {
-                for (int k = 0; k < input_vectors.size(); k++)
+                for (size_t k = 0; k < input_vectors.size(); k++)
                 {
                     result[i][j] += (input_vectors[k][i] - mean[i]) * (input_vectors[k][j] - mean[j]);
                 }
 
-                result[i][j] /= input_vectors.size();
+                result[i][j] /= static_cast<double>(input_vectors.size());
             }
         }
 
