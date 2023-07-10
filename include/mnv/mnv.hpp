@@ -5,7 +5,6 @@
 #include <array>
 #include <cmath>
 #include <memory>
-#include <mnv/export_static.h>
 #include <random>
 #include <string_view>
 #include <variant>

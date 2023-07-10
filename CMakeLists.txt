@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(mnv
     VERSION 1.0.0
-    DESCRIPTION "Template for C++ library built with CMake"
+    DESCRIPTION "Library for generating multivariate normal values"
     LANGUAGES CXX)
 
 #----------------------------------------------------------------------------------------------------------------------
