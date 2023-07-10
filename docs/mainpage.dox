@@ -14,7 +14,7 @@ Easy way:
 If you wish to add the cmake project
 1. git clone the repo to your project folder
 2. use add_subdirectory(<path-to-repo>) command
-3. use target_link_libraries(<your-executable-name> mnv)
+3. use target_link_libraries(<your-executable-name> PRIVATE mnv::mnv)
 
 \section interface_sec Libray's interface
 See \ref mnv

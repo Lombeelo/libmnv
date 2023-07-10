@@ -342,7 +342,7 @@ namespace mnv
                     result[i][j] += (input_vectors[k][i] - mean[i]) * (input_vectors[k][j] - mean[j]);
                 }
 
-                result[i][j] /= static_cast<double>(input_vectors.size());
+                result[i][j] /= static_cast<T>(input_vectors.size());
             }
         }
 
