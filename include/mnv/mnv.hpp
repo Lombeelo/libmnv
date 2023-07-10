@@ -21,10 +21,10 @@
  * @file mnv.hpp Main interface file of the mnv library
  * @author Dmitry Parfenyuk (cekunda.rf@gmail.com)
  * @brief A header-only library to generate random multivariate normal values
- * @version 0.1
+ * @version 1.0.0
  * @date 2023-07-08
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023 Dmitry Parfenyuk
  *
  */
 
