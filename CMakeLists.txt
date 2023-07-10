@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.13)
 project(mnv
     VERSION 1.0.0
     DESCRIPTION "Template for C++ library built with CMake"
@@ -17,6 +17,8 @@ string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" is_top_
 option(MNV_BUILD_TESTS "Build mnv tests" OFF)
 option(MNV_BUILD_EXAMPLES "Build mnv examples" OFF)
 option(MNV_BUILD_DOCS "Build mnv documentation" OFF)
+option(MNV_ERRORS_INCLUDE_MESSAGES "The returned error types contain the error message, not only an enum" OFF)
+
 
 
 if(NOT DEFINED CMAKE_BUILD_TYPE AND NOT DEFINED CMAKE_CONFIGURATION_TYPES)
@@ -29,23 +31,16 @@ set (CMAKE_CXX_STANDARD 17)
 set_if_undefined(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set_if_undefined(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-add_library(mnv) # initialized below
+add_library(mnv INTERFACE) # initialized below
 add_library(mnv::mnv ALIAS mnv)
 
 #----------------------------------------------------------------------------------------------------------------------
 # mnv sources
 #----------------------------------------------------------------------------------------------------------------------
 
-include(GenerateExportHeader)
-
-set(export_file_name "export_static.h")
-
-generate_export_header(mnv EXPORT_FILE_NAME include/mnv/${export_file_name})
-
 set(sources
     include/mnv/mnv.hpp
-    include/mnv/mnv-impl.hpp
-    src/mnv.cpp)
+    include/mnv/mnv-impl.hpp)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -54,16 +49,12 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
 include(CMakePackageConfigHelpers)
 
-target_sources(mnv PRIVATE ${sources})
+target_sources(mnv INTERFACE ${sources})
 
 target_include_directories(mnv
-    PUBLIC
+    INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>")
-
-set_target_properties(mnv PROPERTIES
-    SOVERSION ${PROJECT_VERSION_MAJOR}
-    VERSION ${PROJECT_VERSION})
 
 #----------------------------------------------------------------------------------------------------------------------
 # other targets

@@ -1,14 +1,21 @@
 /*!
-\mainpage This is a main page for libmnv
+\mainpage
 
 \section intro_sec Introduction
 
-This is the introduction.
+The mnv library is used to generate random multivariate normal values.
 
 \section install_sec Installation
 
-1. Copy headers
-2. Voila
+Easy way:
+1. git clone the repo
+2. Copy include folder to your project's folder.
 
-\subsection step1 Step 1: Opening the box
+If you wish to add the cmake project
+1. git clone the repo to your project folder
+2. use add_subdirectory(<path-to-repo>) command
+3. use target_link_libraries(<your-executable-name> mnv)
+
+\section interface_sec Libray's interface
+See \ref mnv
 */

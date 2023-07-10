@@ -195,7 +195,7 @@ TEST(mnv_generator_test, covariance_is_right)
     auto gen = std::get<mnv::MNVGenerator<double, 6>>(gen_packed);
 
     std::vector<mnv::valueVector<double, 6>> values{};
-    int amountOfValues = 10000;
+    size_t amountOfValues = 10000;
     values.reserve(amountOfValues);
     for (size_t i = 0; i < amountOfValues; i++)
     {

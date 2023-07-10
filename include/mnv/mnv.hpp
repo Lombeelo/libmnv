@@ -22,6 +22,10 @@
  *
  */
 
+/**
+ * @brief The mnv namespace
+ *
+ */
 namespace mnv
 {
     /**
@@ -42,22 +46,66 @@ namespace mnv
     template <typename T, size_t Dim>
     using MatrixSq = valueVector<valueVector<T, Dim>, Dim>;
 
+    /**
+     * @brief Struct to signal, that the generator build process was failed
+     *
+     */
     struct MNVGeneratorBuildError
     {
+        /**
+         * @brief Error type. Can be matched against to make error handling more straightforward
+         *
+         */
         enum class type
         {
             CovarianceMatrixIsNotPositiveDefinite,
             CovarianceMatrixIsNotSymmetric,
-        } type;
+        };
+        /**
+         * @brief Field that holds the error type
+         *
+         */
+        type type;
+
+        /**
+         * @brief Error message. You can use them to print the error
+         *
+         */
         std::string_view message;
     };
 
+    /**
+     * @brief The main Generator class. It incapsulates the internal rng state and distribution parameters
+     *
+     *
+     * @tparam T Type of values generated
+     * @tparam Dim Dimension count of values
+     */
     template <typename T, size_t Dim>
     class MNVGenerator
     {
     public:
+        /**
+         * @brief Generate the next value of rng.
+         *
+         * @return valueVector<T, Dim> Generated value
+         */
         valueVector<T, Dim> nextValue();
 
+        /**
+         * @brief Main build fuction
+         *
+         * @param covariance Covariance matrix. MUST be positive-definite and symmetric.
+         * @param mean Mean vector.
+         * @param seed Starting internal rng seed.
+         * @return std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError> \n
+         *          If error happened, variant will contain MNVGeneratorBuildError. \n
+         *          Else, there will be an instance of MNVGenerator. \n
+         *          To properly check for errors, you should always check with std::holds_alternative<mnv::MNVGeneratorBuildError>() \n
+         *          before std::get<>()'ing the generator \n
+         *          See also <a href="https://en.cppreference.com/w/cpp/utility/variant">std::variant [cppreference.com]</a> \n
+         *          You can also check tests and examples for usage.
+         */
         static std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError>
         build(
             MatrixSq<T, Dim> const &covariance,
