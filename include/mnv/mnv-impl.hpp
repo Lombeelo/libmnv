@@ -202,28 +202,26 @@ namespace mnv
         {
             MatrixSq<T, Dim> result{};
             // 3. Decomposition itself
-            for (size_t j = 0; j < matrix.size(); j++)
+            result[0][0] = std::sqrt(matrix[0][0]);
+
+            for (size_t i = 1; i < matrix.size(); i++)
+            {
+                result[i][0] = matrix[i][0] / result[0][0];
+            }
+
+            for (size_t j = 1; j < matrix.size(); j++)
             {
                 for (size_t i = j; i < matrix.size(); i++)
                 {
-                    if ((i == 0) && (j == 0))
-                    {
-                        result[i][j] = std::sqrt(matrix[i][i]);
-                        continue;
-                    }
-
-                    if (j == 0)
-                    {
-                        result[i][j] = matrix[i][j] / result[0][0];
-                        continue;
-                    }
 
                     if (i == j)
                     {
                         result[i][j] = std::sqrt(matrix[i][i] - sumOfSquaresUntil(result[i], j));
-                        continue;
                     }
-                    result[i][j] = (matrix[i][j] - sumOfProductsUntil(result[i], result[j], j)) / result[j][j];
+                    else
+                    {
+                        result[i][j] = (matrix[i][j] - sumOfProductsUntil(result[i], result[j], j)) / result[j][j];
+                    }
                 }
             }
 
@@ -257,8 +255,6 @@ namespace mnv
             internal::multiplyMatrixByVector(m_decomposedCovariance, randomStandardNormalVector);
         return internal::addVectors(multipliedVector, m_mean);
     }
-
-    struct MNVGeneratorBuildError;
 
     template <typename T, size_t Dim>
     std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError>
