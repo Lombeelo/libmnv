@@ -296,6 +296,13 @@ namespace mnv
             internal::doCholetskyDecomposition(covariance), mean, seed);
     }
 
+    template <typename T, size_t Dim>
+    void MNVGenerator<T, Dim>::seed(size_t seed)
+    {
+        m_generator.seed(seed);
+        return;
+    }
+
     // private constructor is used to force MNVGenerator::build()
     template <typename T, size_t Dim>
     MNVGenerator<T, Dim>::MNVGenerator(MatrixSq<T, Dim> decomposedCovariance, valueVector<T, Dim> mean, size_t seed)

@@ -99,6 +99,13 @@ namespace mnv
         valueVector<T, Dim> nextValue();
 
         /**
+         * @brief Set a new seed for internal rng
+         *
+         * @param seed A new seed
+         */
+        void seed(size_t seed);
+
+        /**
          * @brief Main build fuction
          *
          * @param covariance Covariance matrix. MUST be positive-definite and symmetric.
