@@ -106,11 +106,11 @@ namespace mnv
         void seed(size_t seed);
 
         /**
-         * @brief Main build fuction
+         * @brief Main constructor fuction, construction is implemented as static function to be able to return std::variant instead of throwing errors
          *
          * @param covariance Covariance matrix. MUST be positive-definite and symmetric.
          * @param mean Mean vector.
-         * @param seed Starting internal rng seed.
+         * @param seed Internal rng seed.
          * @return std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError> \n
          *          If error happened, variant will contain MNVGeneratorBuildError. \n
          *          Else, there will be an instance of MNVGenerator. \n
@@ -123,7 +123,25 @@ namespace mnv
         build(
             MatrixSq<T, Dim> const &covariance,
             valueVector<T, Dim> const &mean,
-            size_t seed);
+            size_t seed = 0);
+
+        /**
+         * @brief Alternative constructor, in case you have raw values instead of ready-to-use distribution params
+         *
+         * @param statisticVectors Raw statistics
+         * @param seed Internal rng seed
+         * @return std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError> \n
+         *          If error happened, variant will contain MNVGeneratorBuildError. \n
+         *          Else, there will be an instance of MNVGenerator. \n
+         *          To properly check for errors, you should always check with std::holds_alternative<mnv::MNVGeneratorBuildError>() \n
+         *          before std::get<>()'ing the generator \n
+         *          See also <a href="https://en.cppreference.com/w/cpp/utility/variant">std::variant [cppreference.com]</a> \n
+         *          You can also check tests and examples for usage.
+         */
+        static std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError>
+        build(
+            std::vector<valueVector<T, Dim>> const &statisticVectors,
+            size_t seed = 0);
 
     private:
         // private constructor is used to force MNVGenerator::build()

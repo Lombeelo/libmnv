@@ -5,17 +5,21 @@
 
 The mnv library is used to generate random multivariate normal values.
 
+\section defs Additional defines
+You can define this before #include'ing the header to alter the behaviour. \n
+MNV_ERRORS_INCLUDE_MESSAGES - We use mnv::MNVGeneratorBuildError struct to signal errors. Macro controls, wether struct includes error message.
+
 \section install_sec Installation
 
 Easy way:
-1. git clone the repo
+1. git clone the repo;
 2. Copy include folder to your project's folder.
 
-If you wish to add the cmake project
-1. git clone the repo to your project folder
-2. use add_subdirectory(<path-to-repo>) command
-3. use target_link_libraries(<your-executable-name> PRIVATE mnv::mnv)
+If you wish to add the cmake project;
+1. git clone the repo to your project folder;
+2. use add_subdirectory(<path-to-repo>) command;
+3. use target_link_libraries(<your-executable-name> PRIVATE mnv::mnv);
 
 \section interface_sec Libray's interface
-See \ref mnv
+See \ref mnv.
 */

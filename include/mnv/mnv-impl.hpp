@@ -272,7 +272,7 @@ namespace mnv
             // error: ABSOLUTELY wrong matrix
             return MNVGeneratorBuildError{
                 MNVGeneratorBuildError::type::CovarianceMatrixIsNotSymmetric,
-                ERRMSG("The covariance matrix provided is not symmetric. It's totally unsuitable to use here. Please provide a valid covariance matrix.")};
+                ERRMSG("The covariance matrix provided is not symmetric. It's totally unsuitable to use here. Please provide a valid covariance matrix.\n")};
         }
 
         // 2. Check for positive-definite matrix
@@ -284,7 +284,7 @@ namespace mnv
         case MatrixDefinition::Undefinite:       // error: how tf you did that (wrong matrix)?
             return MNVGeneratorBuildError{
                 MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite,
-                ERRMSG("The covariance matrix provided is not positive-definite. Is it the right matrix?")};
+                ERRMSG("The covariance matrix provided is not positive-definite. It could be the wrong matrix or there's not enough values provided to construct the positive-definite one\n")};
 
         case MatrixDefinition::PositiveDefinite: // ok
             break;
@@ -294,6 +294,17 @@ namespace mnv
 
         return MNVGenerator<T, Dim>(
             internal::doCholetskyDecomposition(covariance), mean, seed);
+    }
+
+    template <typename T, size_t Dim>
+    std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError>
+    MNVGenerator<T, Dim>::build(
+        std::vector<valueVector<T, Dim>> const &statisticVectors,
+        size_t seed)
+    {
+        return build(calculateCovarianceMatrix(statisticVectors),
+                     calculateMeanVector(statisticVectors),
+                     seed);
     }
 
     template <typename T, size_t Dim>

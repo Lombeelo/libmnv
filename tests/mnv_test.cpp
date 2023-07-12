@@ -182,6 +182,27 @@ TEST(mnv_generator_test, build_works)
     EXPECT_NE(gen_ptr, nullptr);
 }
 
+TEST(mnv_generator_test, build2_works)
+{
+    const std::vector<mnv::valueVector<double, 3>> stats = {
+        {75, 10.5, 45},
+        {65, 12.8, 65},
+        {22, 7.3, 74},
+        {15, 2.1, 76},
+        {18, 9.2, 56}};
+    const std::vector<mnv::valueVector<double, 3>> stats_not_enough_info = {
+        {75, 10.5, 45},
+        {65, 12.8, 65}};
+
+    auto gen_failed = mnv::MNVGenerator<double, 3>::build(stats_not_enough_info, 0);
+    auto error = std::get<mnv::MNVGeneratorBuildError>(gen_failed);
+    EXPECT_EQ(error.type, mnv::MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite);
+
+    auto gen = mnv::MNVGenerator<double, 3>::build(stats, 0);
+    auto gen_ptr = std::get_if<mnv::MNVGenerator<double, 3>>(&gen);
+    EXPECT_NE(gen_ptr, nullptr);
+}
+
 TEST(mnv_generator_test, covariance_is_right)
 {
     const mnv::valueVector<double, 6> mean{{0, 2, 4, 8, 16, 32}};
