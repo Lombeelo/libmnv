@@ -34,7 +34,7 @@
 namespace mnv
 {
     /**
-     * @brief Basic vector, can be abstracted away
+     * @brief Basic vector, actually an std::array
      *
      * @tparam T Underlying type, supposedly float/decimal
      * @tparam Dim Length of array, can be abstracted
