@@ -27,11 +27,11 @@ if(NOT MNV_USE_LOCAL_DEPS)
     FetchContent_MakeAvailable(googletest)
 
 else()
-
+    set(MNV_LOCAL_GTEST_PATH "deps/googletest-1.13.0" CACHE STRING "Path to locally downloaded gtest sources.")
     set(INSTALL_GTEST OFF)
     set(BUILD_SHARED_LIBS_OLD ${BUILD_SHARED_LIBS})
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCED)
-    add_subdirectory(../deps/googletest-1.13.0 ../deps/build/googletest-1.13.0)
+    add_subdirectory(../${MNV_LOCAL_GTEST_PATH} ../${MNV_LOCAL_GTEST_PATH})
     set(BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS_OLD} CACHE BOOL "" FORCED)
 
 endif(NOT MNV_USE_LOCAL_DEPS)
