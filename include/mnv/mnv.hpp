@@ -166,7 +166,7 @@ namespace mnv
      * @return MatrixSq<T, Dim> The covariance matrix
      */
     template <typename T, size_t Dim>
-    MatrixSq<T, Dim> calculateCovarianceMatrix(std::vector<valueVector<T, Dim>> const &input_vectors);
+    MatrixSq<T, Dim> calculateCovarianceMatrix(std::vector<valueVector<T, Dim>> const &inputVectors);
 
     /**
      * @brief Function to statistically calculate mean vector using statistic data
@@ -177,7 +177,7 @@ namespace mnv
      * @return valueVector<T, Dim> The mean vector
      */
     template <typename T, size_t Dim>
-    valueVector<T, Dim> calculateMeanVector(std::vector<valueVector<T, Dim>> const &input_vectors);
+    valueVector<T, Dim> calculateMeanVector(std::vector<valueVector<T, Dim>> const &inputVectors);
 
 } // namespace mnv
 

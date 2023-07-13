@@ -323,40 +323,40 @@ namespace mnv
     }
 
     template <typename T, size_t Dim>
-    valueVector<T, Dim> calculateMeanVector(std::vector<valueVector<T, Dim>> const &input_vectors)
+    valueVector<T, Dim> calculateMeanVector(std::vector<valueVector<T, Dim>> const &inputVectors)
     {
         valueVector<T, Dim> result{};
 
-        for (auto &&vec : input_vectors)
+        for (auto &&vec : inputVectors)
         {
             result = internal::addVectors(result, vec);
         }
 
         for (size_t i = 0; i < result.size(); i++)
         {
-            result[i] /= static_cast<T>(input_vectors.size());
+            result[i] /= static_cast<T>(inputVectors.size());
         }
 
         return result;
     }
 
     template <typename T, size_t Dim>
-    MatrixSq<T, Dim> calculateCovarianceMatrix(std::vector<valueVector<T, Dim>> const &input_vectors)
+    MatrixSq<T, Dim> calculateCovarianceMatrix(std::vector<valueVector<T, Dim>> const &inputVectors)
     {
         MatrixSq<T, Dim> result{};
 
-        valueVector<T, Dim> mean = calculateMeanVector(input_vectors);
+        valueVector<T, Dim> mean = calculateMeanVector(inputVectors);
 
         for (size_t i = 0; i < result.size(); i++)
         {
             for (size_t j = 0; j < result.size(); j++)
             {
-                for (size_t k = 0; k < input_vectors.size(); k++)
+                for (size_t k = 0; k < inputVectors.size(); k++)
                 {
-                    result[i][j] += (input_vectors[k][i] - mean[i]) * (input_vectors[k][j] - mean[j]);
+                    result[i][j] += (inputVectors[k][i] - mean[i]) * (inputVectors[k][j] - mean[j]);
                 }
 
-                result[i][j] /= static_cast<T>(input_vectors.size());
+                result[i][j] /= static_cast<T>(inputVectors.size());
             }
         }
 

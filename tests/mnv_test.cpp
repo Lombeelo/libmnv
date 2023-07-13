@@ -7,30 +7,30 @@
 #include <variant>
 #include <vector>
 
-TEST(linear_algebra_test, vector_dot_product_works)
+TEST(linearAlgebraTest, vectorDotProductWorks)
 {
     int product = mnv::internal::vectorDotProduct<int, 3>({1, 2, 3}, {4, 5, 6});
     ASSERT_EQ(product, 32);
 }
-TEST(linear_algebra_test, sum_of_squares_until_works)
+TEST(linearAlgebraTest, sumOfSquaresUntilWorks)
 {
     int product = mnv::internal::sumOfSquaresUntil<int, 3>({4, 5, 6}, 2);
     ASSERT_EQ(product, 41);
 }
-TEST(linear_algebra_test, sum_of_products_until_works)
+TEST(linearAlgebraTest, sumOfProductsUntilWorks)
 {
     int product = mnv::internal::sumOfProductsUntil<int, 3>({1, 2, 3}, {4, 5, 6}, 2);
     ASSERT_EQ(product, 14);
 }
 
-TEST(linear_algebra_test, add_vectors_works)
+TEST(linearAlgebraTest, addVectorsWorks)
 {
     mnv::valueVector<int, 3> summ =
         mnv::internal::addVectors<int, 3>({1, 2, 3}, {4, 5, 6});
     ASSERT_THAT(summ, testing::ElementsAre(5, 7, 9));
 }
 
-TEST(linear_algebra_test, calculate_mean_vector_works)
+TEST(linearAlgebraTest, calculateMeanVectorWorks)
 {
     mnv::valueVector<float, 3> mean =
         mnv::calculateMeanVector<float, 3>(
@@ -38,13 +38,13 @@ TEST(linear_algebra_test, calculate_mean_vector_works)
     ASSERT_THAT(mean, testing::ElementsAre(2.5f, 3.5f, 4.5f));
 }
 
-TEST(linear_algebra_test, is_odd_works)
+TEST(linearAlgebraTest, isOddWorks)
 {
     EXPECT_TRUE(mnv::internal::isOdd(1));
     EXPECT_FALSE(mnv::internal::isOdd(2));
 }
 
-const mnv::MatrixSq<double, 6> test_matrix =
+const mnv::MatrixSq<double, 6> testMatrix =
     {{{5, 4, 3, 2, 4, 2},
       {4, 7, 4, 2, 1, 4},
       {3, 4, 3, 1, 1, 1},
@@ -52,7 +52,7 @@ const mnv::MatrixSq<double, 6> test_matrix =
       {4, 1, 1, 1, 6, 2},
       {2, 4, 1, 2, 2, 6}}};
 
-const mnv::MatrixSq<double, 6> test_matrix_decomposed =
+const mnv::MatrixSq<double, 6> testMatrixDecomposed =
     {{{2.236, 0, 0, 0, 0, 0},
       {1.789, 1.949, 0, 0, 0, 0},
       {1.342, 0.821, 0.725, 0, 0, 0},
@@ -60,54 +60,54 @@ const mnv::MatrixSq<double, 6> test_matrix_decomposed =
       {1.789, -1.129, -0.653, -0.508, 0.918, 0},
       {0.894, 1.231, -1.669, 0.073, 0.803, 0.5}}};
 
-TEST(linear_algebra_test, is_matrix_symmetric_works)
+TEST(linearAlgebraTest, isMatrixSymmetricWorks)
 {
-    EXPECT_TRUE(mnv::internal::isMatrixSymmetric(test_matrix));
-    mnv::MatrixSq<double, 6> other = test_matrix;
+    EXPECT_TRUE(mnv::internal::isMatrixSymmetric(testMatrix));
+    mnv::MatrixSq<double, 6> other = testMatrix;
     other[1][3] = 1;
     EXPECT_FALSE(mnv::internal::isMatrixSymmetric(other));
 }
 
-TEST(linear_algebra_test, choletsky_decomposition_works)
+TEST(linearAlgebraTest, choletskyDecompositionWorks)
 {
 
-    auto decomposed = mnv::internal::doCholetskyDecomposition(test_matrix);
+    auto decomposed = mnv::internal::doCholetskyDecomposition(testMatrix);
     for (size_t i = 0; i < decomposed.size(); i++)
     {
         for (size_t j = 0; j < decomposed.size(); j++)
         {
-            EXPECT_NEAR(decomposed[i][j], test_matrix_decomposed[i][j], 0.001) << "i and j were " << i << " " << j << std::endl;
+            EXPECT_NEAR(decomposed[i][j], testMatrixDecomposed[i][j], 0.001) << "i and j were " << i << " " << j << std::endl;
         }
     }
 }
 
-TEST(linear_algebra_test, minor_calculation_works)
+TEST(linearAlgebraTest, minorCalculationWorks)
 {
-    const std::array<double, 6> testing_matrix_minors =
+    const std::array<double, 6> testingMatrixMinors =
         {5, 19, 10, 19, 16, 4};
-    for (unsigned int i = 0; i < testing_matrix_minors.size(); i++)
+    for (unsigned int i = 0; i < testingMatrixMinors.size(); i++)
     {
-        double minor = mnv::internal::calculateMinor(test_matrix, i + 1);
-        EXPECT_EQ(minor, testing_matrix_minors[i]);
+        double minor = mnv::internal::calculateMinor(testMatrix, i + 1);
+        EXPECT_EQ(minor, testingMatrixMinors[i]);
     }
 }
 
-TEST(linear_algebra_test, matrix_definition_works)
+TEST(linearAlgebraTest, matrixDefinitionWorks)
 {
-    const mnv::MatrixSq<double, 3> pos_def{{{2, -1, 2},
-                                            {-1, 1, -3},
-                                            {2, -3, 11}}};
-    const mnv::MatrixSq<double, 3> neg_def{{{-2, 1, 0},
-                                            {1, -2, 0},
-                                            {0, 0, -2}}};
+    const mnv::MatrixSq<double, 3> posDef{{{2, -1, 2},
+                                           {-1, 1, -3},
+                                           {2, -3, 11}}};
+    const mnv::MatrixSq<double, 3> negDef{{{-2, 1, 0},
+                                           {1, -2, 0},
+                                           {0, 0, -2}}};
     const mnv::MatrixSq<double, 3> undef{{{-2, 2, 0},
                                           {2, -2, 0},
                                           {0, 0, -8}}};
-    auto def = mnv::internal::defineMatrix(pos_def);
+    auto def = mnv::internal::defineMatrix(posDef);
     EXPECT_EQ(def,
               mnv::internal::MatrixDefinition::PositiveDefinite);
 
-    def = mnv::internal::defineMatrix(neg_def);
+    def = mnv::internal::defineMatrix(negDef);
     EXPECT_EQ(def,
               mnv::internal::MatrixDefinition::NegativeDefinite);
 
@@ -116,7 +116,7 @@ TEST(linear_algebra_test, matrix_definition_works)
               mnv::internal::MatrixDefinition::Undefinite);
 }
 
-TEST(linear_algebra_test, multiply_matrix_by_vector_works)
+TEST(linearAlgebraTest, multiplyMatrixByVectorWorks)
 {
     const mnv::MatrixSq<double, 3> matrix{{{-2, 2, 0},
                                            {2, -2, 0},
@@ -127,7 +127,7 @@ TEST(linear_algebra_test, multiply_matrix_by_vector_works)
     ASSERT_THAT(result, testing::ElementsAre(2, -2, -24));
 }
 
-TEST(statistic_calculations_test, calculate_cov_matrix_works)
+TEST(statisticCalculationsTest, calculateCovMatrixWorks)
 {
     const std::vector<mnv::valueVector<double, 3>> stats = {
         {75, 10.5, 45},
@@ -136,27 +136,27 @@ TEST(statistic_calculations_test, calculate_cov_matrix_works)
         {15, 2.1, 76},
         {18, 9.2, 56}};
 
-    const mnv::MatrixSq<double, 3> test_cov{{{655.6, 68.62, -189.6},
-                                             {68.62, 13.0616, -25.716},
-                                             {-189.6, -25.716, 133.36}}};
-    const auto cov_calculated = mnv::calculateCovarianceMatrix(stats);
-    for (size_t i = 0; i < cov_calculated.size(); i++)
+    const mnv::MatrixSq<double, 3> testCov{{{655.6, 68.62, -189.6},
+                                            {68.62, 13.0616, -25.716},
+                                            {-189.6, -25.716, 133.36}}};
+    const auto covCalculated = mnv::calculateCovarianceMatrix(stats);
+    for (size_t i = 0; i < covCalculated.size(); i++)
     {
-        for (size_t j = 0; j < cov_calculated.size(); j++)
+        for (size_t j = 0; j < covCalculated.size(); j++)
         {
-            EXPECT_NEAR(cov_calculated[i][j], test_cov[i][j], 0.001) << "i and j were " << i << " " << j << std::endl;
+            EXPECT_NEAR(covCalculated[i][j], testCov[i][j], 0.001) << "i and j were " << i << " " << j << std::endl;
         }
     }
 }
 
-TEST(mnv_generator_test, build_works)
+TEST(mnvGeneratorTest, buildWorks)
 {
-    const mnv::MatrixSq<double, 3> pos_def{{{2, -1, 2},
-                                            {-1, 1, -3},
-                                            {2, -3, 11}}};
-    const mnv::MatrixSq<double, 3> neg_def{{{-2, 1, 0},
-                                            {1, -2, 0},
-                                            {0, 0, -2}}};
+    const mnv::MatrixSq<double, 3> posDef{{{2, -1, 2},
+                                           {-1, 1, -3},
+                                           {2, -3, 11}}};
+    const mnv::MatrixSq<double, 3> negDef{{{-2, 1, 0},
+                                           {1, -2, 0},
+                                           {0, 0, -2}}};
     const mnv::MatrixSq<double, 3> undef{{{-2, 2, 0},
                                           {2, -2, 0},
                                           {0, 0, -8}}};
@@ -165,24 +165,24 @@ TEST(mnv_generator_test, build_works)
                                                {0, 0, -8}}};
     const mnv::valueVector<double, 3> mean{{1, 1, 1}};
 
-    auto gen_failed = mnv::MNVGenerator<double, 3>::build(neg_def, mean, 0);
-    auto error = std::get<mnv::MNVGeneratorBuildError>(gen_failed);
+    auto genFailed = mnv::MNVGenerator<double, 3>::build(negDef, mean, 0);
+    auto error = std::get<mnv::MNVGeneratorBuildError>(genFailed);
     EXPECT_EQ(error.type, mnv::MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite);
 
-    gen_failed = mnv::MNVGenerator<double, 3>::build(undef, mean, 0);
-    error = std::get<mnv::MNVGeneratorBuildError>(gen_failed);
+    genFailed = mnv::MNVGenerator<double, 3>::build(undef, mean, 0);
+    error = std::get<mnv::MNVGeneratorBuildError>(genFailed);
     EXPECT_EQ(error.type, mnv::MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite);
 
-    gen_failed = mnv::MNVGenerator<double, 3>::build(assymetric, mean, 0);
-    error = std::get<mnv::MNVGeneratorBuildError>(gen_failed);
+    genFailed = mnv::MNVGenerator<double, 3>::build(assymetric, mean, 0);
+    error = std::get<mnv::MNVGeneratorBuildError>(genFailed);
     EXPECT_EQ(error.type, mnv::MNVGeneratorBuildError::type::CovarianceMatrixIsNotSymmetric);
 
-    auto gen = mnv::MNVGenerator<double, 3>::build(pos_def, mean, 0);
-    auto gen_ptr = std::get_if<mnv::MNVGenerator<double, 3>>(&gen);
-    EXPECT_NE(gen_ptr, nullptr);
+    auto gen = mnv::MNVGenerator<double, 3>::build(posDef, mean, 0);
+    auto genPtr = std::get_if<mnv::MNVGenerator<double, 3>>(&gen);
+    EXPECT_NE(genPtr, nullptr);
 }
 
-TEST(mnv_generator_test, build2_works)
+TEST(mnvGeneratorTest, build2Works)
 {
     const std::vector<mnv::valueVector<double, 3>> stats = {
         {75, 10.5, 45},
@@ -190,30 +190,30 @@ TEST(mnv_generator_test, build2_works)
         {22, 7.3, 74},
         {15, 2.1, 76},
         {18, 9.2, 56}};
-    const std::vector<mnv::valueVector<double, 3>> stats_not_enough_info = {
+    const std::vector<mnv::valueVector<double, 3>> statsNotEnoughInfo = {
         {75, 10.5, 45},
         {65, 12.8, 65}};
 
-    auto gen_failed = mnv::MNVGenerator<double, 3>::build(stats_not_enough_info, 0);
-    auto error = std::get<mnv::MNVGeneratorBuildError>(gen_failed);
+    auto genFailed = mnv::MNVGenerator<double, 3>::build(statsNotEnoughInfo, 0);
+    auto error = std::get<mnv::MNVGeneratorBuildError>(genFailed);
     EXPECT_EQ(error.type, mnv::MNVGeneratorBuildError::type::CovarianceMatrixIsNotPositiveDefinite);
 
     auto gen = mnv::MNVGenerator<double, 3>::build(stats, 0);
-    auto gen_ptr = std::get_if<mnv::MNVGenerator<double, 3>>(&gen);
-    EXPECT_NE(gen_ptr, nullptr);
+    auto genPtr = std::get_if<mnv::MNVGenerator<double, 3>>(&gen);
+    EXPECT_NE(genPtr, nullptr);
 }
 
-TEST(mnv_generator_test, covariance_is_right)
+TEST(mnvGeneratorTest, covarianceIsRight)
 {
     const mnv::valueVector<double, 6> mean{{0, 2, 4, 8, 16, 32}};
 
-    auto gen_packed = mnv::MNVGenerator<double, 6>::build(test_matrix, mean, 0);
-    if (std::holds_alternative<mnv::MNVGeneratorBuildError>(gen_packed))
+    auto genPacked = mnv::MNVGenerator<double, 6>::build(testMatrix, mean, 0);
+    if (std::holds_alternative<mnv::MNVGeneratorBuildError>(genPacked))
     {
         FAIL();
     }
 
-    auto gen = std::get<mnv::MNVGenerator<double, 6>>(gen_packed);
+    auto gen = std::get<mnv::MNVGenerator<double, 6>>(genPacked);
 
     std::vector<mnv::valueVector<double, 6>> values{};
     size_t amountOfValues = 10000;
@@ -229,13 +229,13 @@ TEST(mnv_generator_test, covariance_is_right)
     {
         for (size_t j = 0; j < cov.size(); j++)
         {
-            EXPECT_NEAR(cov[i][j], test_matrix[i][j], 0.1) << "i and j were " << i << " " << j << std::endl;
+            EXPECT_NEAR(cov[i][j], testMatrix[i][j], 0.1) << "i and j were " << i << " " << j << std::endl;
         }
     }
 
-    auto mean_calcualated = mnv::calculateMeanVector(values);
-    for (size_t j = 0; j < mean_calcualated.size(); j++)
+    auto meanCalcualated = mnv::calculateMeanVector(values);
+    for (size_t j = 0; j < meanCalcualated.size(); j++)
     {
-        EXPECT_NEAR(mean_calcualated[j], mean[j], 0.1);
+        EXPECT_NEAR(meanCalcualated[j], mean[j], 0.1);
     }
 }
