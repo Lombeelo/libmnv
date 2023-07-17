@@ -319,7 +319,10 @@ namespace mnv
     MNVGenerator<T, Dim>::MNVGenerator(MatrixSq<T, Dim> decomposedCovariance, valueVector<T, Dim> mean, size_t seed)
         : m_decomposedCovariance(decomposedCovariance), m_mean(mean), m_seed(seed)
     {
-        this->m_generator.seed(seed);
+        if (seed != 0)
+        {
+            m_generator.seed(seed);
+        }
     }
 
     template <typename T, size_t Dim>
@@ -356,7 +359,7 @@ namespace mnv
                     result[i][j] += (inputVectors[k][i] - mean[i]) * (inputVectors[k][j] - mean[j]);
                 }
 
-                result[i][j] /= static_cast<T>(inputVectors.size());
+                result[i][j] /= (static_cast<T>(inputVectors.size()) - 1);
             }
         }
 

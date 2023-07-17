@@ -4,6 +4,20 @@
 #include <iostream>
 #include <vector>
 
+template <typename Matr>
+void printMatrix(Matr matr)
+{
+    for (size_t i = 0; i < matr.size(); i++)
+    {
+        std::cout << "{ ";
+        for (auto &&item : matr[i])
+        {
+            std::cout << item << ", ";
+        }
+        std::cout << "}" << std::endl;
+    }
+}
+
 int main(int, char *[])
 {
     // sample data
@@ -22,7 +36,7 @@ int main(int, char *[])
     auto covariance = mnv::calculateCovarianceMatrix(samples);
     auto mean = mnv::calculateMeanVector(samples);
 
-    auto gen_packed = mnv::MNVGenerator<float, 5>::build(covariance, mean, 100);
+    auto gen_packed = mnv::MNVGenerator<float, 5>::build(covariance, mean, 1000);
     // Error handling
     if (std::holds_alternative<mnv::MNVGeneratorBuildError>(gen_packed))
     {
@@ -33,16 +47,19 @@ int main(int, char *[])
 
     auto generator = std::get<mnv::MNVGenerator<float, 5>>(gen_packed);
     std::cout << "Generating samples:" << std::endl;
-    for (size_t i = 0; i < 10; i++)
+    std::vector<mnv::valueVector<float, 5>> values;
+    for (size_t i = 0; i < 100; i++)
     {
-        mnv::valueVector<float, 5> value = generator.nextValue();
-        std::cout << "{ ";
-        for (auto &&item : value)
-        {
-            std::cout << item << ", ";
-        }
-        std::cout << "}" << std::endl;
+        values.push_back(generator.nextValue());
     }
+
+    printMatrix(values);
+
+    std::cout << "covariance before: " << std::endl;
+
+    printMatrix(covariance);
+    std::cout << "covariance after: " << std::endl;
+    printMatrix(mnv::calculateCovarianceMatrix(values));
 
     return 0;
 }

@@ -207,7 +207,7 @@ TEST(mnvGeneratorTest, covarianceIsRight)
 {
     const mnv::valueVector<double, 6> mean{{0, 2, 4, 8, 16, 32}};
 
-    auto genPacked = mnv::MNVGenerator<double, 6>::build(testMatrix, mean, 0);
+    auto genPacked = mnv::MNVGenerator<double, 6>::build(testMatrix, mean, 1);
     if (std::holds_alternative<mnv::MNVGeneratorBuildError>(genPacked))
     {
         FAIL();
