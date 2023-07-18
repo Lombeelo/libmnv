@@ -317,12 +317,15 @@ namespace mnv
     // private constructor is used to force MNVGenerator::build()
     template <typename T, size_t Dim>
     MNVGenerator<T, Dim>::MNVGenerator(MatrixSq<T, Dim> decomposedCovariance, valueVector<T, Dim> mean, size_t seed)
-        : m_decomposedCovariance(decomposedCovariance), m_mean(mean), m_seed(seed)
+        : m_decomposedCovariance(decomposedCovariance), m_mean(mean)
     {
-        if (seed != 0)
+        if (seed == 0)
         {
-            m_generator.seed(seed);
+            std::random_device rd{};
+            seed = rd();
         }
+        m_seed = seed;
+        m_generator.seed(seed);
     }
 
     template <typename T, size_t Dim>

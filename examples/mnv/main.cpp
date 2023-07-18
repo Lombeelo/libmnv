@@ -36,7 +36,7 @@ int main(int, char *[])
     auto covariance = mnv::calculateCovarianceMatrix(samples);
     auto mean = mnv::calculateMeanVector(samples);
 
-    auto gen_packed = mnv::MNVGenerator<float, 5>::build(covariance, mean, 1000);
+    auto gen_packed = mnv::MNVGenerator<float, 5>::build(covariance, mean, 0);
     // Error handling
     if (std::holds_alternative<mnv::MNVGeneratorBuildError>(gen_packed))
     {
@@ -48,12 +48,12 @@ int main(int, char *[])
     auto generator = std::get<mnv::MNVGenerator<float, 5>>(gen_packed);
     std::cout << "Generating samples:" << std::endl;
     std::vector<mnv::valueVector<float, 5>> values;
-    for (size_t i = 0; i < 100; i++)
+    for (size_t i = 0; i < 100000; i++)
     {
         values.push_back(generator.nextValue());
     }
 
-    printMatrix(values);
+    // printMatrix(values);
 
     std::cout << "covariance before: " << std::endl;
 
