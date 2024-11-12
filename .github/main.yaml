@@ -1,0 +1,20 @@
+name: Build and test
+on:
+  pull_request:
+  push:
+jobs:
+  build-project:
+    name: Build Project
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4.2.1
+
+      - name: Build Project
+        uses: threeal/cmake-action@v2.0.0
+        with:
+          - options: |
+            MNV_BUILD_TESTS=ON
+            MNV_BUILD_EXAMPLES=ON
+            MNV_BUILD_DOCS=ON
+      - run: cmake test
