@@ -53,6 +53,11 @@ namespace mnv
         template <typename T, size_t Dim>
         T calculateMinor(MatrixSq<T, Dim> const &matrix, unsigned int minor_order)
         {
+            if (Dim < minor_order) // Ошибка, выходим втихую
+            {
+                return 0;
+            }
+
             if (minor_order == 1)
             {
                 return matrix[0][0];
@@ -167,7 +172,10 @@ namespace mnv
         {
             T sum = 0;
 
-            for (size_t i = 0; i < idx; i++)
+            // не даем передать значение больше, чем нужно
+            size_t min_idx = std::min(idx, Dim);
+
+            for (size_t i = 0; i < min_idx; i++)
             {
                 sum += vectorA[i] * vectorB[i];
             }
@@ -184,6 +192,16 @@ namespace mnv
         template <typename MatrixType>
         inline bool isMatrixSymmetric(MatrixType const &matrix)
         {
+            if (matrix.empty())
+            {
+                return false;
+            }
+
+            if (matrix.size() != matrix[0].size())
+            {
+                return false;
+            }
+
             for (size_t i = 0; i < matrix.size() - 1; i++)
             {
                 for (size_t j = i + 1; j < matrix.size(); j++)
