@@ -1,0 +1,35 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      # Set a branch name to trigger deployment
+      - release
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4.2.1
+
+      - uses: ssciwr/doxygen-install@v1
+
+      - name: Build documentation
+        uses: threeal/cmake-action@v2.0.0
+        with:
+          options: |
+            MNV_BUILD_TESTS=OFF
+            MNV_BUILD_EXAMPLES=OFF
+            MNV_BUILD_DOCS=ON
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/doc_doxygen/html
