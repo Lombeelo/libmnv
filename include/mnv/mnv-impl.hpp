@@ -314,7 +314,6 @@ namespace mnv
             internal::doCholetskyDecomposition(covariance), mean, seed);
     }
 
-
     template <typename T, size_t Dim>
     std::variant<MNVGenerator<T, Dim>, MNVGeneratorBuildError>
     MNVGenerator<T, Dim>::build(
