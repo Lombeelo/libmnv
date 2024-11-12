@@ -20,4 +20,4 @@ jobs:
             MNV_BUILD_EXAMPLES=ON
             MNV_BUILD_DOCS=ON
             MNV_USE_LOCAL_DEPS=OFF
-      - run: cmake test
+      - run: ctest
